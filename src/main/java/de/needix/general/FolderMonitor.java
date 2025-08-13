@@ -70,9 +70,11 @@ public class FolderMonitor {
     }
 
     private static void processNewFolder(Path folder) {
-        LOGGER.info("Waiting 1 minute before processing folder: " + folder);
+        long timeToWait = 5;
+
+        LOGGER.info("Waiting "+timeToWait+" minutes before processing folder: " + folder);
         try {
-            Thread.sleep(60000); // Wait for 1 minute
+            Thread.sleep(timeToWait * 60 * 1000);
             
             // Process MP4 files
             try (DirectoryStream<Path> stream = Files.newDirectoryStream(folder, "*.mp4")) {
