@@ -41,18 +41,28 @@ public class FolderMonitor {
 
     public static void main(String[] args) {
         LOGGER.info("Starting folder monitor application");
-        
+
+        WatchService watchService;
         try {
-            WatchService watchService = FileSystems.getDefault().newWatchService();
+            watchService = FileSystems.getDefault().newWatchService();
             WATCH_FOLDER.register(watchService, StandardWatchEventKinds.ENTRY_CREATE);
-            
-            while (true) {
+
+        } catch (IOException e) {
+            LOGGER.severe("Error in main monitoring loop: " + e.getMessage());
+            e.printStackTrace();
+            return;
+        }
+
+        processExistingFolders();
+
+        while (true) {
+            try {
                 WatchKey key = watchService.take();
-                
+
                 for (WatchEvent<?> event : key.pollEvents()) {
                     if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
                         Path newPath = WATCH_FOLDER.resolve((Path) event.context());
-                        
+
                         if (Files.isDirectory(newPath) && !processedFolders.contains(newPath)) {
                             LOGGER.info("New folder detected: " + newPath);
                             processNewFolder(newPath);
@@ -60,12 +70,21 @@ public class FolderMonitor {
                         }
                     }
                 }
-                
+
                 key.reset();
+            } catch (InterruptedException e) {
+                LOGGER.severe("Error in main monitoring loop: " + e.getMessage());
+                e.printStackTrace();
             }
-        } catch (IOException | InterruptedException e) {
-            LOGGER.severe("Error in main monitoring loop: " + e.getMessage());
-            e.printStackTrace();
+        }
+    }
+
+    private static void processExistingFolders() {
+        File[] existingFolders = WATCH_FOLDER.toFile().listFiles(File::isDirectory);
+        if(existingFolders != null) {
+            Arrays.stream(existingFolders)
+                    .map(File::toPath)
+                    .forEach(FolderMonitor::processFolder);
         }
     }
 
@@ -102,9 +121,6 @@ public class FolderMonitor {
 
             // Delete the folder and its contents
             deleteFolder(folder);
-
-        } catch (InterruptedException e) {
-            LOGGER.severe("Sleep interrupted: " + e.getMessage());
         } catch (IOException e) {
             LOGGER.severe("Error in main monitoring loop: " + e.getMessage());
             e.printStackTrace();
