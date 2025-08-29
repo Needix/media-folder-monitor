@@ -69,14 +69,21 @@ public class FolderMonitor {
         }
     }
 
-    private static void processNewFolder(Path folder) {
+    private static void processNewFolder(Path folder) throws InterruptedException {
         long timeToWait = 5;
 
-        LOGGER.info("Waiting "+timeToWait+" minutes before processing folder: " + folder);
+        LOGGER.info("Waiting " + timeToWait + " minutes before processing folder: " + folder);
+
+        Thread.sleep(timeToWait * 60 * 1000);
+
+        processFolder(folder);
+    }
+
+    private static void processFolder(Path folder) {
+        LOGGER.info("Processing folder: " + folder);
+
+        // Process MP4 files
         try {
-            Thread.sleep(timeToWait * 60 * 1000);
-            
-            // Process MP4 files
             try (DirectoryStream<Path> stream = Files.newDirectoryStream(folder, "*.mp4")) {
                 for (Path file : stream) {
                     copyFile(file, MUSIC_DESTINATION.resolve(file.getFileName()));
