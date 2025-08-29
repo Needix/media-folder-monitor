@@ -99,7 +99,8 @@ public class FolderMonitor {
         } catch (InterruptedException e) {
             LOGGER.severe("Sleep interrupted: " + e.getMessage());
         } catch (IOException e) {
-            LOGGER.severe("Error processing folder " + folder + ": " + e.getMessage());
+            LOGGER.severe("Error in main monitoring loop: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
