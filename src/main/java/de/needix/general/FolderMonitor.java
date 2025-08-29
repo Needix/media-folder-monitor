@@ -81,7 +81,7 @@ public class FolderMonitor {
 
     private static void processExistingFolders() {
         File[] existingFolders = WATCH_FOLDER.toFile().listFiles(File::isDirectory);
-        if(existingFolders != null) {
+        if (existingFolders != null) {
             Arrays.stream(existingFolders)
                     .map(File::toPath)
                     .forEach(FolderMonitor::processFolder);
@@ -122,40 +122,32 @@ public class FolderMonitor {
             // Delete the folder and its contents
             deleteFolder(folder);
         } catch (IOException e) {
-            LOGGER.severe("Error in main monitoring loop: " + e.getMessage());
+            LOGGER.severe("Error while trying to process folder " + folder + ": " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private static void deleteFolder(Path folder) {
-        try {
-            Files.walkFileTree(folder, new SimpleFileVisitor<>() {
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    Files.delete(file);
-                    LOGGER.info("Deleted file: " + file);
-                    return FileVisitResult.CONTINUE;
-                }
+    private static void deleteFolder(Path folder) throws IOException {
+        Files.walkFileTree(folder, new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Files.delete(file);
+                LOGGER.info("Deleted file: " + file);
+                return FileVisitResult.CONTINUE;
+            }
 
-                @Override
-                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                    Files.delete(dir);
-                    LOGGER.info("Deleted directory: " + dir);
-                    return FileVisitResult.CONTINUE;
-                }
-            });
-        } catch (IOException e) {
-            LOGGER.severe("Error deleting folder " + folder + ": " + e.getMessage());
-        }
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                Files.delete(dir);
+                LOGGER.info("Deleted directory: " + dir);
+                return FileVisitResult.CONTINUE;
+            }
+        });
     }
 
 
-    private static void copyFile(Path source, Path destination) {
-        try {
-            Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
-            LOGGER.info("Successfully copied " + source + " to " + destination);
-        } catch (IOException e) {
-            LOGGER.severe("Error copying " + source + " to " + destination + ": " + e.getMessage());
-        }
+    private static void copyFile(Path source, Path destination) throws IOException {
+        Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
+        LOGGER.info("Successfully copied " + source + " to " + destination);
     }
 }
