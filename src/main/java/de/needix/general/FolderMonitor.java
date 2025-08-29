@@ -11,9 +11,9 @@ import java.time.format.DateTimeFormatter;
 public class FolderMonitor {
     private static final Logger LOGGER = Logger.getLogger(FolderMonitor.class.getName());
     private static final Path WATCH_FOLDER = Paths.get("/home/need/Downloads/JDownloader");
-    private static final Path MUSIC_DESTINATION = Paths.get("/mnt/music/Music/New/");
-    private static final Path MP3_TOCOPY_DESTINATION = Paths.get("/mnt/music/MP3ToCopy/");
-    private static final Path MP3_UNSORTED_DESTINATION = Paths.get("/mnt/music/MP3/Unsorted/");
+    private static final Path MUSIC_DESTINATION = Paths.get("/mnt/media/Music/New/");
+    private static final Path MP3_TOCOPY_DESTINATION = Paths.get("/mnt/media/MP3ToCopy/");
+    private static final Path MP3_UNSORTED_DESTINATION = Paths.get("/mnt/media/MP3/Unsorted/");
     private static final Set<Path> processedFolders = new HashSet<>();
 
     static {
